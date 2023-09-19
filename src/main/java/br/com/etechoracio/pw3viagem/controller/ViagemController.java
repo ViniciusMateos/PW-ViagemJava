@@ -2,7 +2,9 @@ package br.com.etechoracio.pw3viagem.controller;
 
 import br.com.etechoracio.pw3viagem.Entity.Viagem;
 import br.com.etechoracio.pw3viagem.repository.ViagemRepository;
+import org.aspectj.apache.bcel.Repository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,8 +23,13 @@ public class  ViagemController{
     }
 
     @GetMapping("/{id}")
-    public Optional<Viagem> buscarPorId(@PathVariable Long id){
-        return repository.findById(id);
+    public ResponseEntity buscarPorId(@PathVariable Long id)
+    {
+        Optional<Viagem> existe = repository.findById(id);
+        if (existe.isPresent())
+            return ResponseEntity.ok(repository.findById(id));
+        else
+            return ResponseEntity.notFound().build();
     }
 
     @PostMapping
@@ -33,11 +40,26 @@ public class  ViagemController{
     }
 
     @PutMapping("/{id}")
-    public Viagem Atualizar (@PathVariable Long id, @RequestBody Viagem obj)
+    public ResponseEntity Atualizar (@PathVariable Long id, @RequestBody Viagem obj)
     {
-        Optional<Viagem> existe = buscarPorId(id);
-        if(existe.isPresent())
+        Optional<Viagem> existe = repository.findById(id);
+        if(existe.isPresent()) {
             repository.save(obj);
-        return obj;
+            return ResponseEntity.ok(obj);
+        }
+        else
+            return ResponseEntity.notFound().build();
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> excluir(@PathVariable Long id)
+    {
+        Optional<Viagem> existe = repository.findById(id); //Optional - caixa dentro da caixa "Viagem" <Viagem>
+                if(existe.isPresent()) {//verifica se há algo na caixa Optional
+                    repository.deleteById(id); // se tem, deleta
+                    return ResponseEntity.ok().build();
+                }
+                else
+            return ResponseEntity.notFound().build();
     }
 }
