@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 
+//Vinicius Mateos
+
 @RestController
 @RequestMapping("/viagens")
 public class  ViagemController{
@@ -17,9 +19,12 @@ public class  ViagemController{
     private ViagemRepository repository;
 
     @GetMapping()
-    public List<Viagem> buscarTodos()
+    public List<Viagem> buscarTodos(@RequestParam(required = false) String destino)
     {
+        if(destino == null)
         return repository.findAll();
+        else
+            return repository.findByDestino(destino);
     }
 
     @GetMapping("/{id}")
